@@ -13,7 +13,8 @@ class Sensors:
         self.clSensRight.mode = 'COL-COLOR'    
         self.clSensLeft.mode = 'COL-COLOR'
         
-        self.clSensLeft.color
+        if self.clSensLeft.color == 12
+            
 
     
 

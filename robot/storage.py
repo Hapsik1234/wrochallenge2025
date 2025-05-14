@@ -27,6 +27,7 @@ class Storage:
         self.screws = []
 
 
+
     # Move storage up or down
     # Direction accepts Storage.UP or Storage.DOWN
     def lift(self, direction, speed=70, rotations=3): 

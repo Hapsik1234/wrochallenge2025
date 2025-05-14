@@ -56,7 +56,7 @@ def main():
     debug_print('Hello VS Code!')
 
     # wait a bit so you have time to look at the display before the program
-    # exits
+    # 
     time.sleep(5)
 
 if __name__ == '__main__':
