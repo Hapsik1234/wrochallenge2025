@@ -12,6 +12,7 @@ class Storage:
         self.Rotor = SmallMotor(rotor_port) # The spinning sfastika
         self.Lift = LargeMotor(lift_port) # Storage up and down motor
 
+
         self.UP = 1
         self.DOWN = -1
 
@@ -26,6 +27,9 @@ class Storage:
 
         self.screws = []
 
+        
+        self.lift_position = self.DOWN # Default lift position
+
 
 
     # Move storage up or down
@@ -36,19 +40,38 @@ class Storage:
             speed = -speed
     
         self.Lift.on_for_rotations(SpeedPercent(speed), rotations)
+
+        # TODO: Handle idiotizm
+        self.lift_position = -self.lift_position
    
     # Rotate storage
     # direction accepts Storage.GOODIRECTION or Storage.BADIRECTION
     def rotate(self, n=1, step=90, speed=SpeedPercent(25), direction=1):
         
+        if (self.lift_position == self.DOWN) and step==90:
+            self.screws.rotate(n * direction)
+
         if not direction:
             speed = -speed
 
         self.Rotor.on_for_degrees(speed, step*n)
 
-    # A complete 
+    # Runs a program that loads screws to storage bay
     def load_screws(self):
-        #Sensor input required
         
         
         self.lift(self.DOWN)
+
+
+        # =========
+        #  0 |  1
+        # ---+---
+        #  3 |  2
+        # =========
+
+        self.screws = [
+            self.GREENSCREW,
+            self.REDSREW,
+            self.YELLOWSCREW,
+            self.BLUESCREW
+        ]
