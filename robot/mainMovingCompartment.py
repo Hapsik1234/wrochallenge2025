@@ -1,4 +1,3 @@
-
 from ev3dev2.motor import LargeMotor, SpeedPercent   #type: ignore
 
 class mainCompartment:

@@ -1,5 +1,3 @@
-
-
 from ev3dev2.motor import LargeMotor, OUTPUT_D # type: ignore
 
 

@@ -21,12 +21,4 @@ class Sensors:
         
     def sensRotate(self,direction, speed = 80, step = 90):
         self.sensRotor.on_for_degrees(speed * direction, step)
-        
-
-
-
-            
-
-    
-
     
