@@ -1,5 +1,12 @@
 import serial
 import time
+from random import random
+
+distance1 = -1
+distance2 = -1
+
+def format_response(a_response):
+    return a_response.split(",")
 
 
 def connect():
@@ -13,5 +20,10 @@ def connect():
     # Read response
     response = ser.readline()
     print("Received:", response.decode().strip())
+
+    distance1, distance2 = format_response(response.decode().strip())
+
+    
+    
 
     ser.close()

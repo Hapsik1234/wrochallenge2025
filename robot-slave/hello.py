@@ -11,7 +11,9 @@ from sensors import *
 from brickcomm import *
 from mainMovingCompartment import mainCompartment as Steering
 from console import *
-from arduinocomm import connect
+from arduinocomm import *
+
+from brickcomm import yes
 
 # state constants
 ON = True
@@ -33,9 +35,12 @@ def main():
 
     # wait a bit so you have time to look at the display before the program
     # 
+
+    yes()
+
     time.sleep(5)
 
-    connect()
+    # connect()
 
 if __name__ == '__main__':
     main()
