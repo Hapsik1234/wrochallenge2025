@@ -4,10 +4,9 @@ from time import sleep
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_B, SpeedPercent              # type: ignore
 from ev3dev2.motor import MediumMotor as SmallMotor                                 # type: ignore
 
-
 class Storage:
     
-    def __init__(self, rotor_port=OUTPUT_A, lift_port=OUTPUT_B):
+    def __init__(self, rotor_port=OUTPUT_B, lift_port=OUTPUT_A):
         
         self.Rotor = SmallMotor(rotor_port) # The spinning sfastika
         self.Lift = LargeMotor(lift_port) # Storage up and down motor
@@ -21,9 +20,11 @@ class Storage:
 
         # Representation of screws currently loaded in storage bay
         self.GREENSCREW = 1
-        self.BLUESCREW = 2
+        self.REDSREW = 2
         self.YELLOWSCREW = 3
-        self.REDSREW = 4
+        self.BLUESCREW = 4
+        
+        self.EMPTY = 0
 
         self.screws = []
 
@@ -45,29 +46,26 @@ class Storage:
         self.lift_position = -self.lift_position
    
     # Rotate storage
-    # direction accepts Storage.GOODIRECTION or Storage.BADIRECTION
-    def rotate(self, n=1, step=90, speed=SpeedPercent(25), direction=1):
+    # direction accepts Storage.GOODDIRECTION or Storage.BADDIRECTION
+    def rotate(self, rotations=1, step=90, speed=SpeedPercent(25), direction=1):
         
         if (self.lift_position == self.DOWN) and step==90:
-            self.screws.rotate(n * direction)
+            self.screws.rotate(rotations * direction)
 
         if not direction:
             speed = -speed
 
-        self.Rotor.on_for_degrees(speed, step*n)
+        self.Rotor.on_for_degrees(speed, step*rotations)
 
-    # Runs a program that loads screws to storage bay
+    # loads screws to storage bay
     def load_screws(self):
-        
-        
         self.lift(self.DOWN)
 
-
-        # =========
-        #  0 |  1
-        # ---+---
-        #  3 |  2
-        # =========
+        # #########
+        #   3 # 0 #
+        # #########
+        # # 2 # 1 
+        # #   #####
 
         self.screws = [
             self.GREENSCREW,
@@ -75,3 +73,24 @@ class Storage:
             self.YELLOWSCREW,
             self.BLUESCREW
         ]
+
+    # unloads a singular screw
+    def unload_screw(self, screw):
+        index = self.screws.index(screw)
+
+        if index == 0:
+            self.lift(self.UP)
+            self.rotate()
+            self.lift(self.DOWN)
+            self.rotate(rotations=4)
+            # TODO: back up
+            self.rotate(rotations=3)
+        else:
+            self.rotate(rotations=index)
+            # TODO: back up
+            self.rotate(rotations=(4 - index))
+
+        self.screws[index] = self.EMPTY
+
+            
+        
