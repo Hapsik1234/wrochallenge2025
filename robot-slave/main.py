@@ -41,6 +41,9 @@ def main():
     # --------------
 
     _storage.lift(_storage.UP)
+    _gate.rotate_gate(_gate.DOWN)
+    _moving.move_straight(50, 50, _moving.FORWARD, 5, 4, 100)
+
     
     
 

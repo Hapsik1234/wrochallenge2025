@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import math
 from time import sleep
 
@@ -15,7 +14,7 @@ class Storage:
     
     def __init__(self, main_compartment: main_compartment, rotor_port=OUTPUT_B, lift_port=OUTPUT_A):
         
-        self.Rotor = SmallMotor(rotor_port) # The spinning swastika
+        self.Rotor = SmallMotor(rotor_port) # The spinning swastikas
         self.Lift = LargeMotor(lift_port) # Storage up and down motor
         self.Main_Compartment = main_compartment
 
