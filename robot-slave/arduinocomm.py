@@ -1,14 +1,24 @@
-import serial # type: ignore
+import serial # type: ignore  
 import time, threading
 from random import random
 from console import debug_print
-distance_right = -1
-distance_left = -1
+from ev3dev2.button import Button
+
+
+ser = serial.Serial('/dev/ttyACM0', 9600)
 
 arduino_ready = False
 
 ICODE = "b4115erwin"
 sensorreadingsprefix = "sens."
+class SensorReadings:
+    def __init__(self, distance_left, distance_right, arduino_ready=False):
+        self.distance_left = distance_left
+        self.distance_right = distance_right
+        self.arduino_ready = False
+        self.senosors_ready = False
+    
+sensor_readings = SensorReadings(-1, -1)
 
 def remove_prefix(text, prefix):
     if text.startswith(prefix):
@@ -16,20 +26,19 @@ def remove_prefix(text, prefix):
     return text
 
 def format_response(a_response):
-    entire_prefix = ICODE + "I" + sensorreadingsprefix
-    if a_response.startswith(entire_prefix):
-        a_response = a_response.replace(entire_prefix, "")
-        return a_response.split(", ")
-    else:
-        return [-1, -1]
+    return map(int, a_response.split(", "))
 
-def read(arduinoserial):
+
+def read():
 
     while True:
-        res = arduinoserial.readline()
-        debug_print(b'<Arduino> ' + res.decode().strip())
-
+        res = ser.readline()
         res = res.decode().strip()
+
+        res = str(res)
+        # debug_print('<Arduino> ' + res)
+
+        
 
         if (res.startswith(ICODE)):
             message = remove_prefix(res, ICODE)
@@ -37,20 +46,24 @@ def read(arduinoserial):
             message = message.split(".")[1]
 
             if code == "Isens":
-                distance_right, distance_left = format_response(message.decode().strip())
+                sensor_readings.distance_right, sensor_readings.distance_left =  format_response(message)
+                debug_print(str(sensor_readings.distance_left) + " mm left, " + str(sensor_readings.distance_right) + " mm right")
+            elif code == "Ss1wait":
+                sensor_readings.arduino_ready = True
+                debug_print("Arduino sensor 1 is ready!")
             else:
                 if code[0]=="I":
-                    debug_print(b'Debug information from arduino: ' + code[1:])
+                    debug_print('Debug information from arduino: ' + code[1:])
                 elif code[0]=="S":
-                    debug_print(b'Debug success from arduino: ' + code[1:])
+                    debug_print('Debug success from arduino: ' + code[1:])
                 elif code[0]=="E":
-                    debug_print(b'Debug error from arduino: ' + code[1:])
+                    debug_print('Debug error from arduino: ' + code[1:])
                 else:
                     debug_print(code)
 
-async def connect():
+def connect():
     # Open the serial port
-    ser = serial.Serial('/dev/ttyACM0', 9600)
+    
     time.sleep(2)  # Wait for the Arduino to reset
 
     # Test arduino
@@ -67,8 +80,26 @@ async def connect():
 
     ser.write(b'c\n')
 
+    # Wait for Arduino initalization of sensor 1
+    while sensor_readings.arduino_ready == False:
+        time.sleep(0.005)
+    print("Arduino is ready!")
 
+    btn = Button()
+
+    while True:
+        if btn.enter:
+            print("Center button pressed!")
+            break
+        time.sleep(0.1)
+
+    ser.write(b'c\n')
+
+    time.sleep(1)
+
+    ser.write(b'startsensing\n')
+    sensor_readings.senosors_ready = True
 
     # distance_right, distance_left = format_response(response.decode().strip())
 
-    ser.close()
+    # ser.close()
